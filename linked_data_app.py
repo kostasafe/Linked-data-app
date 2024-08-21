@@ -4,7 +4,7 @@ import pages as pg
 
 st.set_page_config(layout="wide", initial_sidebar_state="collapsed", page_title='Linked Data App', page_icon='img/ionianlogo.ico')
 
-pages = ["Home","GitHub"]
+pages = ["Home", "SecondPage" "GitHub"]
 urls = {"GitHub":"https://github.com/kostasafe/Linked-data-app/"}
 options = {
     "show_menu": False,
@@ -51,6 +51,7 @@ styles = {
 
 functions = {
     "Home": pg.show_Home,
+    "SecondPage": pg.show_SecondPage
     #"GitHub" :pg.show_Git,
 }
 
