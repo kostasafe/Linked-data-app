@@ -1,7 +1,7 @@
 # Linked Data App Progress
 ## Overview
 
-This project is a web application built using Python and Streamlit. The app provides a simple interface with a navigation bar for easy access to different pages, such as "Home" and "GitHub". The application is configured to run in a wide layout with the sidebar collapsed by default.
+This project is a web application built using Python and Streamlit. The app provides a simple interface with a navigation bar for easy access to different pages. The application is configured to run in a wide layout with the sidebar collapsed by default.
 ### Features Implemented
 
     Streamlit Configuration
