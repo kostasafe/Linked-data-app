@@ -4,7 +4,7 @@ import pages as pg
 
 st.set_page_config(layout="wide", initial_sidebar_state="collapsed", page_title='Linked Data App', page_icon='img/ionianlogo.ico')
 
-pages = ["Home", "SecondPage" "GitHub"]
+pages = ["Home", "SecondPage", "GitHub"]
 urls = {"GitHub":"https://github.com/kostasafe/Linked-data-app/"}
 options = {
     "show_menu": False,
@@ -18,10 +18,13 @@ styles = {
         "box-shadow": "0px 4px 6px rgba(0, 0, 0, 0.1)",  
         "position": "fixed",  
         "width": "100%",  
-        "z-index": "1000",  
+        "z-index": "1000",
+        "display": "flex",
+        "justify-content": "space-around",  
+        "align-items": "center",  
     },
     "div": {
-        "max-width": "80rem",  
+        "max-width": "20rem",  
         "margin": "0 auto",  
         "padding": "2rem",  
     },
@@ -31,7 +34,9 @@ styles = {
         "margin": "0 0.25rem",  
         "background-color": "#e0e0e0",  
         "color": "#333",  
-        "font-weight": "500",  
+        "font-weight": "500",
+        "flex": "1",  # Ensure items take up equal space
+        "text-align": "center",  # Center the text in the nav items
     },
     "active": {
         "color": "#f0a500",  
