@@ -1,11 +1,13 @@
 import streamlit as st
 from streamlit_navigation_bar import st_navbar
+import os
 import pages as pg
 
 st.set_page_config(layout="wide", initial_sidebar_state="collapsed", page_title='Linked Data App', page_icon='img/ionianlogo.ico')
 
 pages = ["Home", "SecondPage", "GitHub"]
 urls = {"GitHub":"https://github.com/kostasafe/Linked-data-app/"}
+parent_dir = os.path.dirname(os.path.abspath("__file__"))
 options = {
     "show_menu": False,
     "show_sidebar": False,
@@ -17,7 +19,7 @@ styles = {
         "padding": "1rem",  
         "box-shadow": "0px 4px 6px rgba(0, 0, 0, 0.1)",  
         "position": "fixed",  
-        "width": "100%",  
+        "width": "100%",
         "z-index": "1000",
         "display": "flex",
         "justify-content": "space-around",  

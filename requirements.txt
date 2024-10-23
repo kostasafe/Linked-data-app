@@ -1,2 +1,4 @@
 streamlit
 streamlit_navigation_bar
+pandas
+lxml
