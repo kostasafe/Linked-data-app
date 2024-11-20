@@ -18,40 +18,73 @@ def show_Home():
     st.markdown('<div class="title">Welcome to our Linked Data Analysis Application</div>', unsafe_allow_html=True)
     st.header("Please upload your desired dataset:", divider="orange")
     
+    # Initialize session state for datasets
+    if "datasets" not in st.session_state:
+        st.session_state.datasets = []  # Create a list to store datasets if not already initialized
+
     # File uploader for CSV or XML files
     uploaded_files = st.file_uploader("Choose :green[CSV] or :green[xml] files", type={"csv", "xml"}, accept_multiple_files=True)
     
+    # Load and display uploaded files
     if uploaded_files:
         for uploaded_file in uploaded_files:
-            # Load the data and store it in session state
+            #Load data
             df = load_data_to_session(uploaded_file)
             if df is not None:
+                # Save each dataset to session_state (avoid duplicates by checking file name)
+                if not any(d['name'] == uploaded_file.name for d in st.session_state.datasets):
+                    st.session_state.datasets.append({"name": uploaded_file.name, "data": df})
+                
                 st.success(f"File {uploaded_file.name} loaded successfully!")
                 
-                # Display the dataset in a pretty way using Streamlit's dataframe feature
+                # Display the dataset
                 st.subheader(f"Data from {uploaded_file.name}:")
-                
-                # Display the dataframe with Streamlit's dataframe tool for interactivity
-                st.dataframe(df.style.highlight_max(axis=0), use_container_width=True)
+                st.dataframe(df, use_container_width=True)
             else:
                 st.error(f"Failed to load file {uploaded_file.name}.")
+    
+    # Allow user to choose centralization column if multiple datasets are uploaded
+    if len(st.session_state.datasets) > 1:
+        st.subheader("Choose a column to centralize the datasets:")
 
+        # Identify common columns across all datasets
+        common_columns = set.intersection(*[set(ds['data'].columns) for ds in st.session_state.datasets])
+
+        if common_columns:
+            # User selects the column
+            selected_column = st.selectbox("Select a common column to align datasets:", sorted(common_columns))
+
+            if selected_column:
+                st.success(f"You selected '{selected_column}' as the centralization column.")
+
+                # Display datasets with the selected column moved to the first position
+                for i, dataset in enumerate(st.session_state.datasets):
+                    st.subheader(f"Dataset: {dataset['name']}")
+                    df = dataset['data']
+                    if selected_column in df.columns:
+                        # Reorder columns to place the selected column first
+                        reordered_columns = [selected_column] + [col for col in df.columns if col != selected_column]
+                        reordered_df = df[reordered_columns]
+                        st.dataframe(reordered_df, use_container_width=True)
+                    else:
+                        st.warning(f"Column '{selected_column}' not found in Dataset: {dataset['name']}.")
+        else:
+            st.warning("No common columns found among the datasets.")
+            
 # Function to load each file into a dataframe
 def load_data_to_session(uploaded_file):
     if uploaded_file.name.endswith('.csv'):
         df = pd.read_csv(uploaded_file)
     elif uploaded_file.name.endswith('.xml'):
-        # Use pd.read_xml with XPath to ensure records are correctly parsed
         df = pd.read_xml(uploaded_file, xpath='.//record')
     else:
         st.write("This app only works with .csv and .xml files.")
         return None
-    
+
     # Drop missing rows
     df.dropna(inplace=True)
-    
     return df
 
-# Main app
+# Main function
 if __name__ == "__main__":
     show_Home()
