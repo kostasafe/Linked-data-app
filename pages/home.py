@@ -56,18 +56,19 @@ def show_Home():
 
             if selected_column:
                 st.success(f"You selected '{selected_column}' as the centralization column.")
-
-                # Display datasets with the selected column moved to the first position
-                for i, dataset in enumerate(st.session_state.datasets):
-                    st.subheader(f"Dataset: {dataset['name']}")
-                    df = dataset['data']
-                    if selected_column in df.columns:
-                        # Reorder columns to place the selected column first
-                        reordered_columns = [selected_column] + [col for col in df.columns if col != selected_column]
-                        reordered_df = df[reordered_columns]
-                        st.dataframe(reordered_df, use_container_width=True)
-                    else:
-                        st.warning(f"Column '{selected_column}' not found in Dataset: {dataset['name']}.")
+                generate_button_1 = st.button('Click here to see the modified dataset!')
+                if generate_button_1:
+                    # Display datasets with the selected column moved to the first position
+                    for i, dataset in enumerate(st.session_state.datasets):
+                        st.subheader(f"Dataset: {dataset['name']}")
+                        df = dataset['data']
+                        if selected_column in df.columns:
+                            # Reorder columns to place the selected column first
+                            reordered_columns = [selected_column] + [col for col in df.columns if col != selected_column]
+                            reordered_df = df[reordered_columns]
+                            st.dataframe(reordered_df, use_container_width=True)
+                        else:
+                            st.warning(f"Column '{selected_column}' not found in Dataset: {dataset['name']}.")
         else:
             st.warning("No common columns found among the datasets.")
             
