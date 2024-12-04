@@ -28,7 +28,7 @@ def show_Home():
     # Load and display uploaded files
     if uploaded_files:
         for uploaded_file in uploaded_files:
-            #Load data
+            # Load data
             df = load_data_to_session(uploaded_file)
             if df is not None:
                 # Save each dataset to session_state (avoid duplicates by checking file name)
@@ -36,13 +36,19 @@ def show_Home():
                     st.session_state.datasets.append({"name": uploaded_file.name, "data": df})
                 
                 st.success(f"File {uploaded_file.name} loaded successfully!")
-                
-                # Display the dataset
-                st.subheader(f"Data from {uploaded_file.name}:")
-                st.dataframe(df, use_container_width=True)
             else:
                 st.error(f"Failed to load file {uploaded_file.name}.")
     
+    # Display datasets horizontally
+    if st.session_state.datasets:
+        st.subheader("Uploaded Datasets:")
+        cols = st.columns(len(st.session_state.datasets))
+        
+        for i, dataset in enumerate(st.session_state.datasets):
+            with cols[i]:
+                st.markdown(f"### {dataset['name']}")
+                st.dataframe(dataset['data'], use_container_width=True)
+
     # Allow user to choose centralization column if multiple datasets are uploaded
     if len(st.session_state.datasets) > 1:
         st.subheader("Choose a column to centralize the datasets:")
@@ -56,19 +62,24 @@ def show_Home():
 
             if selected_column:
                 st.success(f"You selected '{selected_column}' as the centralization column.")
-                generate_button_1 = st.button('Click here to see the modified dataset!')
+                generate_button_1 = st.button('Click here to see the modified datasets!')
+
                 if generate_button_1:
-                    # Display datasets with the selected column moved to the first position
+                    # Display centralized datasets horizontally
+                    st.subheader("Centralized Datasets:")
+                    cols = st.columns(len(st.session_state.datasets))
+                    
                     for i, dataset in enumerate(st.session_state.datasets):
-                        st.subheader(f"Dataset: {dataset['name']}")
-                        df = dataset['data']
-                        if selected_column in df.columns:
-                            # Reorder columns to place the selected column first
-                            reordered_columns = [selected_column] + [col for col in df.columns if col != selected_column]
-                            reordered_df = df[reordered_columns]
-                            st.dataframe(reordered_df, use_container_width=True)
-                        else:
-                            st.warning(f"Column '{selected_column}' not found in Dataset: {dataset['name']}.")
+                        with cols[i]:
+                            st.markdown(f"### {dataset['name']}")
+                            df = dataset['data']
+                            if selected_column in df.columns:
+                                # Reorder columns to place the selected column first
+                                reordered_columns = [selected_column] + [col for col in df.columns if col != selected_column]
+                                reordered_df = df[reordered_columns]
+                                st.dataframe(reordered_df, use_container_width=True)
+                            else:
+                                st.warning(f"Column '{selected_column}' not found in Dataset: {dataset['name']}.")
         else:
             st.warning("No common columns found among the datasets.")
             
