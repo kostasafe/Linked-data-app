@@ -13,12 +13,11 @@ def show_SecondPage():
         </style>
         """, unsafe_allow_html=True
     )
-    st.markdown('<div class="title">Data Analysis</div>', unsafe_allow_html=True)
-
+    st.markdown('<div class="title">Data Analysis Dashboard</div>', unsafe_allow_html=True)
+    st.divider()
     # Check if datasets are available
     if "datasets" in st.session_state and st.session_state.datasets:
         st.success("Datasets are available for analysis.")
-        st.divider()
 
         # User selects a dataset for visualization
         selected_dataset_name = st.selectbox(
@@ -28,34 +27,60 @@ def show_SecondPage():
 
         if selected_dataset_name:
             # Retrieve the selected dataset
-            selected_dataset = next(ds for ds in st.session_state.datasets if ds['name'] == selected_dataset_name)
-            df = selected_dataset['data']
+            selected_dataset = next((ds for ds in st.session_state.datasets if ds['name'] == selected_dataset_name), None)
+            df = selected_dataset['data'] #Dataframe extraction
 
-            st.subheader(f"Visualizations for {selected_dataset_name}")
+            # Specific dashboards for each dataset
+            st.subheader(f"Dashboard for {selected_dataset_name}")
+            if "filtered_crime_rates" in selected_dataset_name:
+                st.markdown("### Crime Rates Overview")
 
-            # List all columns for debugging and user feedback
-            st.write("Available Columns in Dataset:", df.columns.tolist())
+                # Crime trends over time
+                fig1 = px.line(df, x="year", y=["Murder", "Rape", "Robbery", "Aggravated Assault", "Property Total", "Burglary", "Larceny", "Motor Vehicle Theft"], color="area",
+                                title="Crime Trends Over Time",
+                                labels={"value": "Crime Count", "year": "year"})
+                st.plotly_chart(fig1, use_container_width=True)
 
-            # Determine the possible x-axis and y-axis candidates
-            columns = df.columns.tolist()
-            numeric_columns = df.select_dtypes(include=['number']).columns.tolist()
+                fig_test = px.line(df, x="year", y="Murder", color="area", title="Test Plot")
+                st.plotly_chart(fig_test)
 
-            with st.expander(f"Customize Graph for {selected_dataset_name}", expanded=True):
-                x_axis = st.selectbox("Choose X-axis:", columns, key=f"x_{selected_dataset_name}")
-                y_axis = st.multiselect("Choose Y-axis (you can select multiple):", numeric_columns, key=f"y_{selected_dataset_name}")
-                chart_type = st.radio("Choose Chart Type:", ["Line Chart", "Bar Chart", "Scatter Plot"], key=f"chart_{selected_dataset_name}")
 
-            # Generate the graph dynamically
-            if x_axis and y_axis:
-                if chart_type == "Line Chart":
-                    fig = px.line(df, x=x_axis, y=y_axis, title=f"{selected_dataset_name} - Line Chart")
-                elif chart_type == "Bar Chart":
-                    fig = px.bar(df, x=x_axis, y=y_axis, title=f"{selected_dataset_name} - Bar Chart")
-                elif chart_type == "Scatter Plot":
-                    fig = px.scatter(df, x=x_axis, y=y_axis, title=f"{selected_dataset_name} - Scatter Plot")
+                # Crime totals by area
+                fig2 = px.bar(df, x="area", y=["Index Total", "Violent Total"], 
+                                title="Total Crimes by Area",
+                              labels={"value": "Total Count", "area": "area"})
+                st.plotly_chart(fig2, use_container_width=True)
 
-                st.plotly_chart(fig, use_container_width=True)
-            else:
-                st.warning("Please select both X-axis and Y-axis columns to generate a graph.")
+            elif "modified_yearly_data" in selected_dataset_name:
+                st.markdown("### Unemployment Trends")
+
+                # Unemployment rate over time
+                fig1 = px.line(df, x="year", y="unemployment_rate", color="area",
+                                 title="Unemployment Rate Over Time",
+                                 labels={"unemployment_rate": "Rate (%)", "year": "year"})
+                st.plotly_chart(fig1, use_container_width=True)
+
+                # Employment breakdown
+                fig2 = px.bar(df, x="area", y=["laborforce", "unemployed", "employed"], 
+                              title="Employment Breakdown by Area",
+                              labels={"value": "Population", "area": "area"})
+                st.plotly_chart(fig2, use_container_width=True)
+
+            elif "ny_county_per_capita_income_all_years" in selected_dataset_name:
+                st.markdown("### Income Analysis")
+
+                # Income over time
+                fig1 = px.line(df, x="year", y="Average Income", color="area",
+                                title="Per Capita Income Over Time",
+                                labels={"Average Income": "Income ($)", "year": "year"})
+                st.plotly_chart(fig1, use_container_width=True)
+
+                # Income comparison by area
+                fig2 = px.bar(df, x="area", y="Average Income", 
+                                title="Average Income by Area",
+                                labels={"Average Income": "Income ($)", "area": "area"})
+                st.plotly_chart(fig2, use_container_width=True)
+        else:
+            st.warning(f"Dataset '{selected_dataset_name}' not found!")
     else:
         st.warning("No datasets loaded. Please go to the Home page to upload datasets.")
