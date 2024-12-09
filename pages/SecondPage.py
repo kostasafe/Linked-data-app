@@ -41,10 +41,6 @@ def show_SecondPage():
                                 labels={"value": "Crime Count", "year": "year"})
                 st.plotly_chart(fig1, use_container_width=True)
 
-                fig_test = px.line(df, x="year", y="Murder", color="area", title="Test Plot")
-                st.plotly_chart(fig_test)
-
-
                 # Crime totals by area
                 fig2 = px.bar(df, x="area", y=["Index Total", "Violent Total"], 
                                 title="Total Crimes by Area",
