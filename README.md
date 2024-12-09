@@ -41,20 +41,20 @@ Main App File: ``` linked_data_app.py ```
 ## File Descriptions
 
 1. ``` linked_data_app.py ```
-* The main entry point of the application. It configures the layout, sets up the navigation bar, and routes to different pages based on user selection.
+   * The main entry point of the application. It configures the layout, sets up the navigation bar, and routes to different pages based on user selection.
 
 2. ```home.py```
 Handles the dataset upload functionality and allows users to centralize datasets by selecting a common column. Key features include:
 
-* File uploader supporting CSV and XML formats.
-* Display of uploaded datasets.
-* Centralization of multiple datasets based on a common column.
+   * File uploader supporting CSV and XML formats.
+   * Display of uploaded datasets.
+   * Centralization of multiple datasets based on a common column.
 
 3. ```SecondPage.py```
 Provides interactive dashboards for analyzing different datasets. Visualizations are implemented using Plotly. Dashboards include:
-* Crime Rates Overview: Line and bar charts for crime statistics.
-* Unemployment Trends: Visualizations for employment data.
-* Income Analysis: Charts showing income trends by area.
+   * Crime Rates Overview: Line and bar charts for crime statistics.
+   * Unemployment Trends: Visualizations for employment data.
+   * Income Analysis: Charts showing income trends by area.
 
 
 ## How to Run the App
@@ -70,6 +70,6 @@ Provides interactive dashboards for analyzing different datasets. Visualizations
    ```streamlit run linked_data_app.py```
 
 4. **Navigate the App:**
-* **Home:** Upload datasets and centralize them.
-* **SecondPage:** Visualize the datasets.
-* **GitHub:** Access the project's GitHub repository.
+   * **Home:** Upload datasets and centralize them.
+   * **SecondPage:** Visualize the datasets.
+   * **GitHub:** Access the project's GitHub repository.
