@@ -59,7 +59,7 @@ Provides interactive dashboards for analyzing different datasets. Visualizations
 
 ## How to Run the App
 
-1. **Install Dpendencies:**
+1. **Install Dependencies:**
    Ensure you have the required libraries installed by running:
    
    ```pip install -r requirements.txt```
