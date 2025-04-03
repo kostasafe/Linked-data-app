@@ -1,102 +1,110 @@
 import streamlit as st
 import pandas as pd
+import difflib
 
-# Function to display the Home page
+def standardize_data(df, column):
+    #Standardizes area names by matching similar ones.
+    df[column] = df[column].astype(str).str.strip()  # Remove extra spaces
+    unique_areas = df[column].dropna().unique()
+    mapping = {}
+
+    for area in unique_areas:
+        match = difflib.get_close_matches(area, mapping.keys(), n=1, cutoff=0.8)
+        if match:
+            mapping[area] = match[0]  # Map to the closest match
+        else:
+            mapping[area] = area  # Keep original
+    
+    df[column] = df[column].map(mapping)
+    return df
+
+def merge_datasets(datasets):
+    #Merges multiple datasets using all common columns as key columns.
+    standardized_dfs = [standardize_data(ds["data"], column) for ds in datasets for column in ds["data"].columns]
+
+    # Find common columns between all datasets
+    common_columns = set.intersection(*[set(ds['data'].columns) for ds in datasets])
+    
+    if len(common_columns) == 0:
+        st.error("No common columns found to merge on.")
+        return None
+    
+    # Merge datasets on the common columns with an outer join to keep all data
+    merged_df = standardized_dfs[0]
+    
+    for df in standardized_dfs[1:]:
+        merged_df = pd.merge(merged_df, df, on=list(common_columns), how="outer", suffixes=('', '_duplicate'))
+    
+    # Remove any duplicate columns created by the merge
+    merged_df = merged_df.loc[:, ~merged_df.columns.str.endswith('_duplicate')]
+    
+    # Ensure 'year' column is properly formatted if present
+    if "year" in merged_df.columns:
+        merged_df["year"] = merged_df["year"].astype(str).str.replace(",", "").str.strip()  # Clean 'year'
+        merged_df["year"] = pd.to_numeric(merged_df["year"], errors="coerce")  # Convert to numeric
+        merged_df = merged_df[merged_df["year"] > 1900]  # Remove invalid years
+
+    if "area" in merged_df.columns:
+        merged_df["area"] = merged_df["area"].astype(str).str.strip()
+
+    # Remove duplicate rows based on the key columns (common columns)
+    merged_df = merged_df.drop_duplicates(subset=list(common_columns), keep='first')
+
+    # Fill missing values with None (or NaN)
+    merged_df = merged_df.where(pd.notnull(merged_df), None)
+
+    return merged_df
+
+
 def show_Home():
-    st.markdown(
-        """
+    st.markdown("""
         <style>
-        .title {
-            font-size: 70px;
-            text-align: center;
-            margin-bottom: 0px;
-            margin-top: 0px;
-        }
+        .title { font-size: 70px; text-align: center; color: #4CAF50; }
+        .header { font-size: 40px; text-align: center; color: #FF6347; }
         </style>
-        """, unsafe_allow_html=True
-    )
-    st.markdown('<div class="title">Welcome to our Linked Data Analysis Application</div>', unsafe_allow_html=True)
-    st.header("Please upload your desired dataset:", divider="orange")
+    """, unsafe_allow_html=True)
     
-    # Initialize session state for datasets
+    st.markdown('<div class="title">Welcome to Linked Data Analysis</div>', unsafe_allow_html=True)
+    st.markdown('<div class="header">Upload Your Dataset:</div>', unsafe_allow_html=True)
+    
     if "datasets" not in st.session_state:
-        st.session_state.datasets = []  # Create a list to store datasets if not already initialized
-
-    # File uploader for CSV or XML files
-    uploaded_files = st.file_uploader("Choose :green[CSV] or :green[xml] files", type={"csv", "xml"}, accept_multiple_files=True)
+        st.session_state.datasets = []
     
-    # Load and display uploaded files
+    uploaded_files = st.file_uploader("Choose CSV/XML", type=["csv", "xml"], accept_multiple_files=True)
     if uploaded_files:
-        for uploaded_file in uploaded_files:
-            # Load data
-            df = load_data_to_session(uploaded_file)
+        for file in uploaded_files:
+            df = load_data(file)
             if df is not None:
-                # Save each dataset to session_state (avoid duplicates by checking file name)
-                if not any(d['name'] == uploaded_file.name for d in st.session_state.datasets):
-                    st.session_state.datasets.append({"name": uploaded_file.name, "data": df})
-                
-                st.success(f"File {uploaded_file.name} loaded successfully!")
-            else:
-                st.error(f"Failed to load file {uploaded_file.name}.")
+                if not any(d['name'] == file.name for d in st.session_state.datasets):
+                    st.session_state.datasets.append({"name": file.name, "data": df})
+                st.success(f"Loaded: {file.name}")
     
-    # Display datasets horizontally
     if st.session_state.datasets:
         st.subheader("Uploaded Datasets:")
         cols = st.columns(len(st.session_state.datasets))
-        
         for i, dataset in enumerate(st.session_state.datasets):
             with cols[i]:
                 st.markdown(f"### {dataset['name']}")
-                st.dataframe(dataset['data'], use_container_width=True)
+                st.dataframe(dataset['data'])
+        
+        if st.button("Merge Datasets"):
+            merged_df = merge_datasets(st.session_state.datasets)
+            if merged_df is not None:
+                st.subheader("Merged Dataset")
+                st.dataframe(merged_df)
 
-    # Allow user to choose centralization column if multiple datasets are uploaded
-    if len(st.session_state.datasets) > 1:
-        st.subheader("Choose a column to centralize the datasets:")
+def load_data(file):
+    if file.name.endswith('.csv'):
+        df = pd.read_csv(file, dtype=str)  # Read everything as string initially
+    elif file.name.endswith('.xml'):
+        df = pd.read_xml(file, xpath='.//record')
+    
+    if "year" in df.columns:
+        df["year"] = df["year"].astype(str).str.replace(",", "").str.strip()  # Remove commas and spaces
+        df["year"] = pd.to_numeric(df["year"], errors='coerce')  # Convert to numeric
+        df = df[df["year"] > 1900]  # Keep only valid years
+    
+    return df.dropna()
 
-        # Identify common columns across all datasets
-        common_columns = set.intersection(*[set(ds['data'].columns) for ds in st.session_state.datasets])
-
-        if common_columns:
-            # User selects the column
-            selected_column = st.selectbox("Select a common column to align datasets:", sorted(common_columns))
-
-            if selected_column:
-                st.success(f"You selected '{selected_column}' as the centralization column.")
-                generate_button_1 = st.button('Click here to see the modified datasets!')
-
-                if generate_button_1:
-                    # Display centralized datasets horizontally
-                    st.subheader("Centralized Datasets:")
-                    cols = st.columns(len(st.session_state.datasets))
-                    
-                    for i, dataset in enumerate(st.session_state.datasets):
-                        with cols[i]:
-                            st.markdown(f"### {dataset['name']}")
-                            df = dataset['data']
-                            if selected_column in df.columns:
-                                # Reorder columns to place the selected column first
-                                reordered_columns = [selected_column] + [col for col in df.columns if col != selected_column]
-                                reordered_df = df[reordered_columns]
-                                st.dataframe(reordered_df, use_container_width=True)
-                            else:
-                                st.warning(f"Column '{selected_column}' not found in Dataset: {dataset['name']}.")
-        else:
-            st.warning("No common columns found among the datasets.")
-            
-# Function to load each file into a dataframe
-def load_data_to_session(uploaded_file):
-    if uploaded_file.name.endswith('.csv'):
-        df = pd.read_csv(uploaded_file)
-    elif uploaded_file.name.endswith('.xml'):
-        df = pd.read_xml(uploaded_file, xpath='.//record')
-    else:
-        st.write("This app only works with .csv and .xml files.")
-        return None
-
-    # Drop missing rows
-    df.dropna(inplace=True)
-    return df
-
-# Main function
 if __name__ == "__main__":
     show_Home()

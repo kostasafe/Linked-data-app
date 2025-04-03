@@ -3,3 +3,4 @@ streamlit_navigation_bar
 pandas
 lxml
 plotly-express
+rapidfuzz
