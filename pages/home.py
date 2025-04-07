@@ -91,6 +91,7 @@ def show_Home():
             merged_df = merge_datasets(st.session_state.datasets)
             if merged_df is not None:
                 st.subheader("Merged Dataset")
+                st.session_state.merged_df = merged_df  # Store merged dataset globally
                 st.dataframe(merged_df)
 
 def load_data(file):
