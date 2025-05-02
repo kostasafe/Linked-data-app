@@ -57,8 +57,6 @@ styles = {
 }
 
 
-
-
 functions = {
     "Home": pg.show_Home,
     "Visualization": pg.show_Visualization
@@ -66,9 +64,6 @@ functions = {
 }
 
 page = st_navbar(pages, styles=styles, urls=urls, options=options,)
-
-
-
 
 go_to = functions.get(page)
 if go_to:
