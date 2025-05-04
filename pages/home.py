@@ -33,7 +33,7 @@ def merge_datasets(datasets):
     merged_df = standardized_dfs[0]
     
     for df in standardized_dfs[1:]:
-        merged_df = pd.merge(merged_df, df, on=list(common_columns), how="outer", suffixes=('', '_duplicate'))
+        merged_df = pd.merge(merged_df, df, on=list(common_columns), how="inner", suffixes=('', '_duplicate'))
     
     # Remove any duplicate columns created by the merge
     merged_df = merged_df.loc[:, ~merged_df.columns.str.endswith('_duplicate')]
