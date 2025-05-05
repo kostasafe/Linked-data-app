@@ -1,75 +1,80 @@
+
 # Linked Data App
+
 ## Overview
 
-This project is a web application built using Python and Streamlit. The app allows users to upload datasets in CSV or XML format, centralize data based on common columns, and visualize various datasets through interactive dashboards. The app features a custom navigation bar and modular structure to streamline navigation and development.
-## Features Implemented 
+This project is a web-based application built using **Python** and **Streamlit**. It allows users to upload multiple datasets in CSV or XML format, automatically **standardizes** and **merges** them using shared columns, and offers dynamic **visualizations** through interactive dashboards. 
 
-#### Streamlit Configuration
+## Features
 
-* Configured the Streamlit app to use a wide layout.
-* Sidebar is collapsed by default.
-* Page title set to "Linked Data App" with a custom favicon (img/ionianlogo.ico).
+### ✅ Dataset Upload & Standardization (Home Page)
 
-#### Custom Navigation Bar
+- Supports uploading of multiple **CSV** or **XML** files.
+- Automatically detects and cleans common issues (e.g. whitespace, inconsistent area names).
+- Uses fuzzy matching to **standardize location names** across datasets.
+- Converts year columns to numeric and filters out invalid values.
+- Displays all uploaded datasets for user inspection.
+- Merges datasets **based on all shared columns** (using **inner join** for consistency in visualization).
+- Removes duplicate and inconsistent entries post-merge.
+- Stores merged dataset in the session state for use across pages.
 
-* Integrated a custom navigation bar using the ```streamlit_navigation_bar``` library.
-* Navigation options include "Home", SecondPage and "GitHub".
+### 📊 Data Visualization (SecondPage)
 
-#### Page Routing
+- Allows users to:
+  - Filter merged data by **year** and **area**.
+  - Choose any column as **X-axis**, **Y-axis**, and optional **color group**.
+- Supports 3 interactive chart types:
+  - **Line Chart**
+  - **Bar Chart**
+  - **Scatter Plot**
+- Built using **Plotly** for smooth, interactive visualizations.
+- Handles missing values and formatting automatically.
 
-Defined functions for different pages:
-* Home: Displays the home page content.
-* GitHub: Directs the user to the GitHub repository.
-* Second Page: Provides interactive visualizations using Plotly and supports dashboards for different datasets
-Implemented routing logic to load the appropriate page based on the selected navigation item.
+### 🌐 Navigation
 
-#### Code Structure
+- Custom navigation bar using `streamlit_navigation_bar`.
+- Navigation options:
+  - **Home:** Upload and merge datasets.
+  - **SecondPage:** Visualize merged data.
+  - **GitHub:** Link to repository.
 
-Main App File: ``` linked_data_app.py ```
-* Manages navigation and routing logic.
+## Project Structure
 
-**Pages Module:**
-* ```home.py```: For dataset upload and processing.
-* ```SecondPage.py:``` For visualization dashboards.
-
-**Configuration:**
-* ```.streamlit/config.toml:``` For app configuration settings.
-
-**Dependencies:**
-* ```requirements.txt:``` To manage project dependencies.
-
-## File Descriptions
-
-1. ``` linked_data_app.py ```
-   * The main entry point of the application. It configures the layout, sets up the navigation bar, and routes to different pages based on user selection.
-
-2. ```home.py```
-Handles the dataset upload functionality and allows users to centralize datasets by selecting a common column. Key features include:
-
-   * File uploader supporting CSV and XML formats.
-   * Display of uploaded datasets.
-   * Centralization of multiple datasets based on a common column.
-
-3. ```SecondPage.py```
-Provides interactive dashboards for analyzing different datasets. Visualizations are implemented using Plotly. Dashboards include:
-   * Crime Rates Overview: Line and bar charts for crime statistics.
-   * Unemployment Trends: Visualizations for employment data.
-   * Income Analysis: Charts showing income trends by area.
-
+```bash
+.
+├── linked_data_app.py         # Main entry point, handles routing
+├── pages/
+│   ├── home.py                # Dataset upload & merge logic
+│   └── SecondPage.py          # Visualization dashboard
+├── img/
+│   └── ionianlogo.ico         # App favicon
+├── requirements.txt           # List of dependencies
+└── .streamlit/
+    └── config.toml            # Streamlit configuration
+```
 
 ## How to Run the App
 
-1. **Install Dependencies:**
-   Ensure you have the required libraries installed by running:
-   
-   ```pip install -r requirements.txt```
+1. **Install dependencies**:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-3. **Run the Streamlit App:**
-   Execute the following command in your terminal:
-   
-   ```streamlit run linked_data_app.py```
+2. **Run the app**:
+   ```bash
+   streamlit run linked_data_app.py
+   ```
+   or by visiting:    https://data-app-gr.streamlit.app/
 
-4. **Navigate the App:**
-   * **Home:** Upload datasets and centralize them.
-   * **SecondPage:** Visualize the datasets.
-   * **GitHub:** Access the project's GitHub repository.
+3. **Navigate using the top bar**:
+   - **Home**: Upload & merge datasets.
+   - **SecondPage**: Visualize merged data.
+   - **GitHub**: Visit the repository.
+
+## Technologies Used
+
+- Python
+- Streamlit
+- Pandas
+- Plotly
+- difflib (for fuzzy name matching)
