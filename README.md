@@ -3,7 +3,7 @@
 
 ## Overview
 
-This project is a web-based application built using **Python** and **Streamlit**. It allows users to upload multiple datasets in CSV or XML format, automatically **standardizes** and **merges** them using shared columns, and offers dynamic **visualizations** through interactive dashboards. 
+This project is a web-based application built using **Python** and **Streamlit**. It allows users to upload multiple datasets in CSV or XML format, automatically **standardizes** and **merges** them using shared columns, and offers (almost) dynamic **visualizations** through interactive dashboards. 
 
 ## Features
 
