@@ -1,5 +1,5 @@
 
-# Linked Data App
+# Data App
 
 ## Overview
 
@@ -42,7 +42,7 @@ This project is a web-based application built using **Python** and **Streamlit**
 
 ```bash
 .
-├── linked_data_app.py         # Main entry point, handles routing
+├── data_app.py         # Main entry point, handles routing
 ├── pages/
 │   ├── home.py                # Dataset upload & merge logic
 │   └── SecondPage.py          # Visualization dashboard
