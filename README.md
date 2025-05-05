@@ -64,9 +64,9 @@ This project is a web-based application built using **Python** and **Streamlit**
    ```bash
    streamlit run linked_data_app.py
    ```
-   or by visiting:    https://data-app-gr.streamlit.app/
+3. Visit app online page at https://data-app-gr.streamlit.app/
 
-3. **Navigate using the top bar**:
+4. **Navigate using the top bar**:
    - **Home**: Upload & merge datasets.
    - **SecondPage**: Visualize merged data.
    - **GitHub**: Visit the repository.
