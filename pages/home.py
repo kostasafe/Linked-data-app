@@ -64,7 +64,7 @@ def show_Home():
         </style>
     """, unsafe_allow_html=True)
     
-    st.markdown('<div class="title">Welcome to Linked Data Analysis</div>', unsafe_allow_html=True)
+    st.markdown('<div class="title">Data Analysis App</div>', unsafe_allow_html=True)
     st.markdown('<div class="header">Upload Your Dataset:</div>', unsafe_allow_html=True)
     
     if "datasets" not in st.session_state:
