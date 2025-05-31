@@ -5,7 +5,7 @@ import pages as pg
 
 st.set_page_config( layout="wide",
                     initial_sidebar_state="collapsed",
-                    page_title='Linked Data App',
+                    page_title='Data App',
                     page_icon='img/ionianlogo.ico'
                     )
 
