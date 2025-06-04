@@ -55,6 +55,9 @@ def show_Visualization():
         for col in [x_col, y_col]:
             df[col] = df[col].astype(str).str.replace(",", "").str.strip()
             df[col] = pd.to_numeric(df[col], errors='coerce')
+        if df[y_col].isna().all():
+            st.error(f"❌ The selected Y-axis column '{y_col}' does not contain valid numeric values.")
+            return
 
         df = df.dropna(subset=[x_col, y_col])
         df = df.sort_values(by=x_col)
