@@ -78,3 +78,4 @@ This project is a web-based application built using **Python** and **Streamlit**
 - Pandas
 - Plotly
 - difflib (for fuzzy name matching)
+- rdflib
