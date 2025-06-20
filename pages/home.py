@@ -87,7 +87,6 @@ def parse_rdf_to_df(file):
 
     df = pd.DataFrame(rows)
 
-    # Καθαρισμός και μετατροπές
     df["year"] = pd.to_numeric(df["year"], errors="coerce")
     df["co2_emissions"] = pd.to_numeric(df["co2_emissions"], errors="coerce")
     df = df.dropna(subset=["year", "co2_emissions"])
