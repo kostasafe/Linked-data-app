@@ -49,30 +49,51 @@ def parse_rdf_to_df(file):
         st.error(f"❌ RDF parsing failed: {e}")
         return pd.DataFrame()
 
-    rows = defaultdict(dict)
+    triples_by_subject = defaultdict(dict)
 
     for s, p, o in g:
         if "rdf-syntax-ns#type" in p:
-            continue  # ⛔ Skip rdf:type statements
+            continue  # skip rdf:type triples
 
         subject = s.split("/")[-1]
         predicate = p.split("/")[-1]
         value = str(o)
-        rows[subject][predicate] = value
+        
+        # Ομαδοποίηση τιμών ανά subject
+        if predicate in triples_by_subject[subject]:
+            if isinstance(triples_by_subject[subject][predicate], list):
+                triples_by_subject[subject][predicate].append(value)
+            else:
+                triples_by_subject[subject][predicate] = [triples_by_subject[subject][predicate], value]
+        else:
+            triples_by_subject[subject][predicate] = value
 
-    if not rows:
-        st.warning("⚠️ RDF file loaded but contains no valid triples.")
-        return pd.DataFrame()
+    # Δημιουργία dataframe με βάση όλα τα subjects και λίστες από τιμές
+    rows = []
+    for subject, props in triples_by_subject.items():
+        years = props.get("year", [])
+        emissions = props.get("co2_emissions", [])
+        if not isinstance(years, list):
+            years = [years]
+        if not isinstance(emissions, list):
+            emissions = [emissions]
+        count = min(len(years), len(emissions))
+        for i in range(count):
+            rows.append({
+                "area": subject,
+                "year": years[i],
+                "co2_emissions": emissions[i]
+            })
 
-    df = pd.DataFrame.from_dict(rows, orient="index").reset_index()
-    df = df.rename(columns={"index": "area"})
+    df = pd.DataFrame(rows)
 
-    if "year" in df.columns:
-        df["year"] = pd.to_numeric(df["year"], errors="coerce")
-    if "co2_emissions" in df.columns:
-        df["co2_emissions"] = pd.to_numeric(df["co2_emissions"], errors="coerce")
+    # Καθαρισμός και μετατροπές
+    df["year"] = pd.to_numeric(df["year"], errors="coerce")
+    df["co2_emissions"] = pd.to_numeric(df["co2_emissions"], errors="coerce")
+    df = df.dropna(subset=["year", "co2_emissions"])
+    df["area"] = df["area"].astype(str).str.strip()
 
-    return df.dropna(subset=["year", "co2_emissions"], how="any")
+    return df
 
 def load_data(file):
     if file.name.endswith('.csv'):
